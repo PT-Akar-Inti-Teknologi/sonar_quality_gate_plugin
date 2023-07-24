@@ -1,4 +1,3 @@
-require('axios-debug-log')
 import { Axios } from "../http";
 
 import * as entity from "./entity";
