@@ -1,5 +1,6 @@
 import { Git, GitMerge, GitReviewParam } from "../git";
 import { Sonar } from "../sonar";
+import { Log } from "../utils";
 
 const INTERVAL_SECONDS = 60;
 
@@ -75,6 +76,7 @@ export class QualityGate {
       vulCnt,
       smellCnt
     );
+    Log.info("comment :"+ comment);;
     // create quality report
     await this.gitMerge.saveQualityDiscussion(comment);
     if (bugCnt + vulCnt + smellCnt > 0) {

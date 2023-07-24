@@ -39,17 +39,17 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "chalk": "^4.1.2",
-    "clear": "^0.1.0",
     "@types/clear": "^0.1.2",
     "@types/command-exists": "^1.2.0",
     "@types/figlet": "^1.5.4",
     "@types/node": "^16.11.0",
     "@types/yargs": "^17.0.4",
     "axios": "^0.23.0",
+    "chalk": "^4.1.2",
+    "clear": "^0.1.0",
     "command-exists": "^1.2.9",
-    "yargs": "^17.2.1",
-    "figlet": "^1.5.2"
+    "figlet": "^1.5.2",
+    "yargs": "^17.2.1"
   },
   "release": {
     "branches": [
@@ -92,7 +92,11 @@
       [
         "@semantic-release/github",
         {
-          "assets": ["CHANGELOG.md", "package.json", "package-lock.json"]
+          "assets": [
+            "CHANGELOG.md",
+            "package.json",
+            "package-lock.json"
+          ]
         }
       ],
       "@semantic-release/npm"

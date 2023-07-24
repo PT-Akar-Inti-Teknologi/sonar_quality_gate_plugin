@@ -1,3 +1,4 @@
+require('axios-debug-log')
 import { Axios } from "../http";
 
 import * as entity from "./entity";
@@ -33,10 +34,13 @@ export class Sonar {
     }
     this.qualityGate = new SonarReport({ host: this.host, projectKey: this.projectKey });
 
+    Log.info("tokenKey: "+ opt.tokenKey);
     const headers = {
       Authorization:
         "Basic " + Buffer.from(opt.tokenKey + ":" + "").toString("base64"),
     };
+    Log.info("this.host: "+ this.host);
+    Log.info("headers: "+ JSON.stringify(headers));
     this.http = new Axios({ host: this.host, headers: headers });
   }
 

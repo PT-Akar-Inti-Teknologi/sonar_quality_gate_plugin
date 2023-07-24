@@ -1,6 +1,7 @@
 import { Git, GitMerge, GitReviewParam } from "../git";
 import { Axios } from "../http";
 import { Comment } from "./entity";
+import { Log } from "../utils";
 
 export class Github implements Git {
   host: string;
@@ -13,7 +14,7 @@ export class Github implements Git {
     token: string;
     projectID: string;
   }) {
-    this.host = opt.host;
+    this.host = `https://api.github.com/repos/${opt.host}`;
     this.projectID = opt.projectID;
 
     const headers = {
@@ -21,7 +22,8 @@ export class Github implements Git {
       "Accept": "application/vnd.github.v3+json"
     };
     this.headers = headers;
-    this.http = new Axios({ host: opt.host, headers: headers });
+    this.http = new Axios({ host: this.host, headers: headers });
+    Log.info("Git http: "+ JSON.stringify(this.http));
   }
 }
 
@@ -52,7 +54,9 @@ export class GithubMerge extends Github implements GitMerge {
   }
 
   async createComment(comment: string, headers?: any): Promise<Comment> {
-    const api = `/repos/${this.projectID}/issues/${this.mergeRequestID}/comments`;
+    Log.info("createComment: ")
+    const api = `/${this.projectID}/issues/${this.mergeRequestID}/comments`;
+    Log.info("api: "+ api);
     const response = await this.http.post(api, {
       body: comment
     }, {}, headers);
@@ -68,19 +72,21 @@ export class GithubMerge extends Github implements GitMerge {
   }
 
   async saveQualityDiscussion(comment: string, headers?: any): Promise<Comment> {
-    const discussion = await this.getQualityDiscussion();
-    let data = null;
-    if (discussion) {
-      data = await this.updateComment(discussion.id, comment, headers);
-    } else {
-      data = await this.createComment(comment, headers);
-    }
+    const discussion = false;
+    const data = await this.createComment(comment, headers);
+    // let data = null;
+    // if (discussion) {
+    //   data = await this.updateComment(discussion.id, comment, headers);
+    // } else {
+    //   data = await this.createComment(comment, headers);
+    // }
     return data;
   }
 
   async createReviewComments(
     params: GitReviewParam[]
   ): Promise<Comment | null> {
+    Log.info("createReviewComments 1");
     const api = `/repos/${this.projectID}/pulls/${this.mergeRequestID}/reviews`;
 
     const comments: any = [];

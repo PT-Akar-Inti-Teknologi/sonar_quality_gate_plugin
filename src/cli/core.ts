@@ -95,19 +95,20 @@ export class Cli {
       isValid = false;
     }
     if (!this.sonarToken) {
-      Log.error("Missing config sonar token.");
+      Log.error("Missing config sonar tokenssss.");
       isValid = false;
     }
     return isValid;
   }
 
   private generateReport() {
-    Log.info("---- generate report ----");
     const sonar = new Sonar({
       tokenKey: this.sonarToken,
       host: this.sonarURL,
       projectKey: this.sonarProjectKey
     });
+    Log.info("---- generate report ----"+ JSON.stringify(sonar));
+    
 
     let gitMerge: GitMerge;
     if (this.argv.provide == Provide.Github || process.env.GITHUB_ACTION ) {
@@ -125,12 +126,10 @@ export class Cli {
         mergeRequestIID: parseInt(this.gitMergeID)
       });
     }
-
     const qualityGate = new QualityGate({
       sonar: sonar,
       gitMerge: gitMerge
     })
-
     qualityGate.handler().then(result => {
       if (!result) {
         Log.error("Quality Gate ran failed.");

@@ -114,17 +114,8 @@ export class SonarReport {
       const duplicatedURL = this.getMetricURL("new_duplicated_lines_density");
       duplicatedText = " [" + param.duplicatedValue.toFixed(2) + "% Duplication](" + duplicatedURL + ")";
     }
-    let status = "";
-    if (param.status == QualityStatus.OK) {
-      status = "passed";
-    } else {
-      status = "failed";
-    }
-
     const report = `# SonarQube Code Analytics 
-## Quality Gate ${status}
-
-${this.icon(status)}
+## Quality Gate 
 
 ## Additional information
 *The following metrics might not affect the Quality Gate status but improving them will improve your project code quality.*
