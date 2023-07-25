@@ -105,7 +105,8 @@ export class Cli {
     const sonar = new Sonar({
       tokenKey: this.sonarToken,
       host: this.sonarURL,
-      projectKey: this.sonarProjectKey
+      projectKey: this.sonarProjectKey,
+      mergeRequestID: this.gitMergeID,
     });
     Log.info("---- generate report ----"+ JSON.stringify(sonar));
     

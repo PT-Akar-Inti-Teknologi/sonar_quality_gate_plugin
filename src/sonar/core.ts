@@ -16,11 +16,14 @@ export class Sonar {
   projectKey?: string;
   qualityGate: SonarReport;
   config?: SonarProperties;
+  mergeRequestID: string;
+  
 
   constructor(opt: {
     tokenKey: string;
     host: string;
     projectKey: string;
+    mergeRequestID: string;
   }) {
     try {
       this.config = new SonarProperties({ projectDir: process.cwd() });
@@ -31,6 +34,7 @@ export class Sonar {
       this.host = opt.host;
       this.projectKey = opt.projectKey;
     }
+    this.mergeRequestID = opt.mergeRequestID;
     this.qualityGate = new SonarReport({ host: this.host, projectKey: this.projectKey });
 
     Log.info("tokenKey: "+ opt.tokenKey);
@@ -44,7 +48,14 @@ export class Sonar {
   }
 
   async getQualityStatus() {
-    const response = await this.http.get<entity.Qualitygate>(SONAR_QUALITY_API, { projectKey: this.projectKey });
+    const response = await this.http.get<entity.Qualitygate>(SONAR_QUALITY_API, { 
+      projectKey: this.projectKey,
+      pullRequest: this.mergeRequestID,
+    });
+    Log.info("getQualityStatus parameter: "+ JSON.stringify({ 
+      projectKey: this.projectKey,
+      pullRequest: this.mergeRequestID,
+    }));
     return response.data;
   }
 
