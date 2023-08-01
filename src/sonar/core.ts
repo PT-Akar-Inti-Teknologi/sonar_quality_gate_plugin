@@ -48,23 +48,14 @@ export class Sonar {
   }
 
   async getQualityStatus() {
-    Log.info("===== quality param: "+ JSON.stringify({ 
-      projectKey: this.projectKey,
-      pullRequest: this.mergeRequestID,
-    }));
     const response = await this.http.get<entity.Qualitygate>(SONAR_QUALITY_API, { 
       projectKey: this.projectKey,
       pullRequest: this.mergeRequestID,
     });
-    Log.info("response: "+ JSON.stringify(response.data));
     return response.data;
   }
 
   async getTaskStatus() {
-    Log.info("sonar task parameter: "+ JSON.stringify({
-      component: this.projectKey,
-      onlyCurrents: true,
-    }));
     const response = await this.http.get<entity.Tasks>(SONAR_TASK_API, {
       component: this.projectKey,
       onlyCurrents: true,

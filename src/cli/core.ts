@@ -124,7 +124,7 @@ export class Cli {
         host: this.gitURL,
         token: this.gitToken,
         projectID: this.gitProjectID,
-        mergeRequestIID: parseInt(this.gitMergeID)
+        mergeRequestID: parseInt(this.gitMergeID)
       });
     }
     const qualityGate = new QualityGate({
