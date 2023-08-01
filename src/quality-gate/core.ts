@@ -43,7 +43,6 @@ export class QualityGate {
       return false;
     }
     const sonarIssues = await this.sonar.findIssuesByPullRequest(this.sonar.mergeRequestID);
-    Log.info("sonarIsseues: "+ JSON.stringify(sonarIssues));
     if (!sonarIssues) {
       return false;
     }
