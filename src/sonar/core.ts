@@ -48,18 +48,23 @@ export class Sonar {
   }
 
   async getQualityStatus() {
+    Log.info("===== quality param: "+ JSON.stringify({ 
+      projectKey: this.projectKey,
+      pullRequest: this.mergeRequestID,
+    }));
     const response = await this.http.get<entity.Qualitygate>(SONAR_QUALITY_API, { 
       projectKey: this.projectKey,
       pullRequest: this.mergeRequestID,
     });
-    Log.info("getQualityStatus parameter: "+ JSON.stringify({ 
-      projectKey: this.projectKey,
-      pullRequest: this.mergeRequestID,
-    }));
+    Log.info("response: "+ JSON.stringify(response.data));
     return response.data;
   }
 
   async getTaskStatus() {
+    Log.info("sonar task parameter: "+ JSON.stringify({
+      component: this.projectKey,
+      onlyCurrents: true,
+    }));
     const response = await this.http.get<entity.Tasks>(SONAR_TASK_API, {
       component: this.projectKey,
       onlyCurrents: true,
@@ -78,6 +83,19 @@ export class Sonar {
     return response.data;
   }
 
+  private async findIssuesByPageByPullRequest(pullRequestId: string, page: number) {
+    const response = await this.http.get<entity.IssueList>(SONAR_ISSUE_API, {
+      componentKeys: this.projectKey,
+      pullRequest: pullRequestId
+    })
+    Log.info("parameter: "+ JSON.stringify({
+      componentKeys: this.projectKey,
+      pullRequest: pullRequestId
+    }))
+    Log.info("issues: "+ JSON.stringify(response.data));
+    return response.data;
+  }
+
   async findIssues(fromTime: string): Promise<entity.IssueList> {
     // first page data
     const issues = await this.findIssuesByPage(fromTime, 1);
@@ -86,6 +104,23 @@ export class Sonar {
       const totalPage = Math.ceil(issues.total / issues.ps);
       for (let p = issues.p + 1; p <= totalPage; p++) {
         const issuePage = await this.findIssuesByPage(fromTime, p);
+        if (!issuePage) {
+          break;
+        }
+        issueList.issues.push(...issuePage.issues);
+      }
+    }
+    return issueList;
+  }
+
+  async findIssuesByPullRequest(pullRequestId: string): Promise<entity.IssueList> {
+    // first page data
+    const issues = await this.findIssuesByPageByPullRequest(pullRequestId, 1);
+    const issueList = issues;
+    if (issues) {
+      const totalPage = Math.ceil(issues.total / issues.ps);
+      for (let p = issues.p + 1; p <= totalPage; p++) {
+        const issuePage = await this.findIssuesByPageByPullRequest(pullRequestId, p);
         if (!issuePage) {
           break;
         }

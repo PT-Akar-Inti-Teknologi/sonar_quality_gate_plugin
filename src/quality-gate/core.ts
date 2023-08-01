@@ -37,12 +37,13 @@ export class QualityGate {
     const taskSubmmitTime = new Date(taskStatus.tasks[0].submittedAt);
     // get previous 1 minutes
     taskSubmmitTime.setSeconds(taskSubmmitTime.getSeconds() - INTERVAL_SECONDS);
-
+    
     const quality = await this.sonar.getQualityStatus();
     if (!quality) {
       return false;
     }
-    const sonarIssues = await this.sonar.findIssues(taskSubmmitTime.isoDateTime());
+    const sonarIssues = await this.sonar.findIssuesByPullRequest(this.sonar.mergeRequestID);
+    Log.info("sonarIsseues: "+ JSON.stringify(sonarIssues));
     if (!sonarIssues) {
       return false;
     }
@@ -71,6 +72,7 @@ export class QualityGate {
     // create review comments
     await this.gitMerge.createReviewComments(gitmergeParams);
     const comment = this.sonar.qualityGate.report(
+      this.sonar.mergeRequestID,
       quality.projectStatus,
       bugCnt,
       vulCnt,
