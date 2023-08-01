@@ -29,10 +29,10 @@ export class GitlabMerge extends Gitlab implements GitMerge {
     host: string;
     token: string;
     projectID: string;
-    mergeRequestIID: number;
+    mergeRequestID: number;
   }) {
     super(opt);
-    this.mergeRequestIID = opt.mergeRequestIID;
+    this.mergeRequestIID = opt.mergeRequestID;
   }
 
   async getVersion(headers?: any): Promise<entity.MergeRequestVersion> {
