@@ -5,6 +5,7 @@ import { Log } from "../utils";
 
 export class Github implements Git {
   host: string;
+  owner: string;
   http: Axios;
   projectID: string;
   headers?: any;
@@ -14,7 +15,8 @@ export class Github implements Git {
     token: string;
     projectID: string;
   }) {
-    this.host = `https://api.github.com/repos/${opt.host}`;
+    this.owner = opt.host;
+    this.host = `https://api.github.com`;
     this.projectID = opt.projectID;
 
     const headers = {
@@ -55,7 +57,7 @@ export class GithubMerge extends Github implements GitMerge {
 
   async createComment(comment: string, headers?: any): Promise<Comment> {
     Log.info("createComment: ")
-    const api = `/${this.projectID}/issues/${this.mergeRequestID}/comments`;
+    const api = `/repos/${this.owner}/${this.projectID}/issues/${this.mergeRequestID}/comments`;
     Log.info("api: "+ api);
     const response = await this.http.post(api, {
       body: comment
@@ -86,8 +88,7 @@ export class GithubMerge extends Github implements GitMerge {
   async createReviewComments(
     params: GitReviewParam[]
   ): Promise<Comment | null> {
-    Log.info("createReviewComments 1");
-    const api = `/repos/${this.projectID}/pulls/${this.mergeRequestID}/reviews`;
+    const api = `/repos/${this.owner}/${this.projectID}/pulls/${this.mergeRequestID}/reviews`;
 
     const comments: any = [];
     for (const i in params) {
