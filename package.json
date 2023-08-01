@@ -1,10 +1,10 @@
 {
-  "name": "sonar-quality-gate",
-  "version": "1.0.6",
+  "name": "sonar-quality-gate-plugin",
+  "version": "1.1.0",
   "description": "",
   "main": "./build/index.js",
   "bin": {
-    "quality-gate": "./build/index.js"
+    "sonar-quality-gate": "./build/index.js"
   },
   "scripts": {
     "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node'",
@@ -20,7 +20,7 @@
     "sonar scanner",
     "gitlab"
   ],
-  "author": "dieuhd",
+  "author": "AIT",
   "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^17.6.7",
