@@ -57,12 +57,16 @@ export class SonarReport {
     return level[val];
   }
 
-  private getIssueURL(type: string) {
-    return this.host + `/project/issues?id=${this.projectKey}&resolved=false&sinceLeakPeriod=true&types=${type}`;
+  private getIssueURL(type: string, mergeRequestID: string) {
+    return this.host + `/project/issues?id=${this.projectKey}&resolved=false&sinceLeakPeriod=true&types=${type}&pullRequest=${mergeRequestID}`;
   }
 
-  private getMetricURL(metric: string) {
-    return this.host + `/project/issues?id=${this.projectKey}&metric=${metric}&view=list`;
+  private getSonarURL(mergeRequestID: string) {
+    return this.host + `/project/issues?id=${this.projectKey}&pullRequest=${mergeRequestID}`;
+  }
+
+  private getMetricURL(metric: string, mergeRequestID: string) {
+    return this.host + `/project/issues?id=${this.projectKey}&metric=${metric}&view=list&pullRequest=${mergeRequestID}`;
   }
 
   private getIssueSecurity(projectStatus: ProjectStatus) {
@@ -94,6 +98,7 @@ export class SonarReport {
   }
 
   templateReport(param: {
+    mergeRequestID: string,
     status: string,
     bugCount: number,
     bugSecurity: string,
@@ -107,11 +112,11 @@ export class SonarReport {
 
     let coverageText = "**Coverage**";
     if (param.coverageValue >= 0) {
-      coverageText = " [" + param.coverageValue.toFixed(2) + "% Coverage](" + this.getMetricURL("new_coverage") + ")";
+      coverageText = " [" + param.coverageValue.toFixed(2) + "% Coverage](" + this.getMetricURL("new_coverage", param.mergeRequestID) + ")";
     }
     let duplicatedText = "**Duplication**";
     if (param.duplicatedValue >= 0) {
-      const duplicatedURL = this.getMetricURL("new_duplicated_lines_density");
+      const duplicatedURL = this.getMetricURL("new_duplicated_lines_density", param.mergeRequestID);
       duplicatedText = " [" + param.duplicatedValue.toFixed(2) + "% Duplication](" + duplicatedURL + ")";
     }
     let status = "";
@@ -125,16 +130,17 @@ export class SonarReport {
 ## Quality Gate ${status}
 
 ${this.icon(status)}
+[Sonar report] (${this.getSonarURL(param.mergeRequestID)})
 
 ## Additional information
 *The following metrics might not affect the Quality Gate status but improving them will improve your project code quality.*
 
 ## Issues
-${this.icon("bug")}  ${this.icon(param.bugSecurity)} [${param.bugCount} Bugs](${this.getIssueURL("BUG")})
+${this.icon("bug")}  ${this.icon(param.bugSecurity)} [${param.bugCount} Bugs](${this.getIssueURL("BUG", param.mergeRequestID)})
 
-${this.icon("vulnerability")}  ${this.icon(param.vulnerabilitySecurity)} [${param.vulnerabilityCount} Vulnerabilities](${this.getIssueURL("VULNERABILITY")})
+${this.icon("vulnerability")}  ${this.icon(param.vulnerabilitySecurity)} [${param.vulnerabilityCount} Vulnerabilities](${this.getIssueURL("VULNERABILITY", param.mergeRequestID)})
 
-${this.icon("code_smell")}  ${this.icon(param.codeSmellSecurity)} [${param.codeSmellCount} Code Smells](${this.getIssueURL("CODE_SMELL")})
+${this.icon("code_smell")}  ${this.icon(param.codeSmellSecurity)} [${param.codeSmellCount} Code Smells](${this.getIssueURL("CODE_SMELL", param.mergeRequestID)})
 
 ## Coverage and Duplications
 ${this.coverageIcon(param.coverageValue)} ${coverageText}
@@ -147,6 +153,7 @@ ${this.duplicatedIcon(param.duplicatedValue)} ${duplicatedText}`;
 
 
   report(
+    mergeRequestID: string,
     projectStatus: ProjectStatus,
     bugCount: number,
     vulnerabilityCount: number,
@@ -154,6 +161,7 @@ ${this.duplicatedIcon(param.duplicatedValue)} ${duplicatedText}`;
   ) {
     const [bugSecurity, vulSecurity, smellSecurity, duplicatedCode, coverateValue] = this.getIssueSecurity(projectStatus)
     return this.templateReport({
+      mergeRequestID: mergeRequestID,
       status: projectStatus.status,
       bugCount: bugCount,
       bugSecurity: bugSecurity as string,
