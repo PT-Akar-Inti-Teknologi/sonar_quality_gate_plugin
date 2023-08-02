@@ -30,14 +30,18 @@ export class QualityGate {
   }
 
   async handler() {
+    Log.info("====")
+    Log.info("start getTaskStatus");
     const taskStatus = await this.sonar.getTaskStatus();
+    Log.info("finish getTaskStatus");
     if (!taskStatus || taskStatus.tasks.length == 0) {
       return false;
     }
     const taskSubmmitTime = new Date(taskStatus.tasks[0].submittedAt);
     // get previous 1 minutes
     taskSubmmitTime.setSeconds(taskSubmmitTime.getSeconds() - INTERVAL_SECONDS);
-    
+    Log.info("====")
+    Log.info("start getQualityStatus");
     let quality = await this.sonar.getQualityStatus();
     // delay 10 second if sonar not ready yet
     if (quality.projectStatus.status == 'NONE') {
@@ -48,7 +52,11 @@ export class QualityGate {
     if (!quality) {
       return false;
     }
+    Log.info("finish getQualityStatus");
+    Log.info("====")
+    Log.info("start findIssuesByPullRequest");
     const sonarIssues = await this.sonar.findIssuesByPullRequest(this.sonar.mergeRequestID);
+    Log.info("finish findIssuesByPullRequest");
     if (!sonarIssues) {
       return false;
     }
@@ -75,6 +83,8 @@ export class QualityGate {
       })
     }
     // create review comments
+    Log.info("====")
+    Log.info("start createReviewComments");
     await this.gitMerge.createReviewComments(gitmergeParams);
     const comment = this.sonar.qualityGate.report(
       this.sonar.mergeRequestID,
@@ -83,12 +93,16 @@ export class QualityGate {
       vulCnt,
       smellCnt
     );
+    Log.info("finish createReviewComments");
     Log.info("comment :"+ comment);;
     // create quality report
+    Log.info("====")
+    Log.info("start saveQualityDiscussion");
     await this.gitMerge.saveQualityDiscussion(comment);
     if (bugCnt + vulCnt + smellCnt > 0) {
       return false;
     }
+    Log.info("finish saveQualityDiscussion");
     return true;
   }
 }
