@@ -62,7 +62,7 @@ export class SonarReport {
   }
 
   private getSonarURL(mergeRequestID: string) {
-    return this.host + `/project/issues?id=${this.projectKey}&pullRequest=${mergeRequestID}`;
+    return this.host + `/project/dasboard?id=${this.projectKey}&pullRequest=${mergeRequestID}`;
   }
 
   private getMetricURL(metric: string, mergeRequestID: string) {
@@ -127,9 +127,10 @@ export class SonarReport {
     }
 
     const report = `# SonarQube Code Analytics 
-## Quality Gate ${status}
+## Quality Gate ${param.status}
 
 ${this.icon(status)}
+
 [Sonar report] (${this.getSonarURL(param.mergeRequestID)})
 
 ## Additional information

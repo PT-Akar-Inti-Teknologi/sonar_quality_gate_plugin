@@ -38,7 +38,13 @@ export class QualityGate {
     // get previous 1 minutes
     taskSubmmitTime.setSeconds(taskSubmmitTime.getSeconds() - INTERVAL_SECONDS);
     
-    const quality = await this.sonar.getQualityStatus();
+    let quality = await this.sonar.getQualityStatus();
+    // delay 10 second if sonar not ready yet
+    if (quality.projectStatus.status == 'NONE') {
+      const ms = 10000;
+      await new Promise(resolve => setTimeout(resolve, ms));
+      quality = await this.sonar.getQualityStatus();
+    }
     if (!quality) {
       return false;
     }
