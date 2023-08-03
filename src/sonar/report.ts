@@ -62,7 +62,7 @@ export class SonarReport {
   }
 
   private getSonarURL(mergeRequestID: string) {
-    return this.host + `/project/dasboard?id=${this.projectKey}&pullRequest=${mergeRequestID}`;
+    return this.host + `/project/dashboard?id=${this.projectKey}&pullRequest=${mergeRequestID}`;
   }
 
   private getMetricURL(metric: string, mergeRequestID: string) {

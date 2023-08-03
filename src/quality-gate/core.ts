@@ -45,14 +45,15 @@ export class QualityGate {
     let quality = await this.sonar.getQualityStatus();
     // delay 10 second if sonar not ready yet
     if (quality.projectStatus.status == 'NONE') {
-      const ms = 10000;
+      const ms = 20000;
+      Log.info("delay and rerun");
       await new Promise(resolve => setTimeout(resolve, ms));
       quality = await this.sonar.getQualityStatus();
     }
     if (!quality) {
       return false;
     }
-    Log.info("finish getQualityStatus");
+    Log.info("finish getQualityStatus: "+ JSON.stringify(quality));
     Log.info("====")
     Log.info("start findIssuesByPullRequest");
     const sonarIssues = await this.sonar.findIssuesByPullRequest(this.sonar.mergeRequestID);
