@@ -44,7 +44,7 @@ export class QualityGate {
     Log.info("start getQualityStatus");
     let quality = await this.sonar.getQualityStatus();
     // delay 10 second if sonar not ready yet
-    if (quality.projectStatus.status == 'NONE') {
+    if (!quality || quality.projectStatus.status == 'NONE') {
       const ms = 20000;
       Log.info("delay and rerun");
       await new Promise(resolve => setTimeout(resolve, ms));
@@ -64,12 +64,17 @@ export class QualityGate {
 
     let bugCnt = 0,
       vulCnt = 0,
-      smellCnt = 0;
+      smellCnt = 0, 
+      closedCnt = 0;
 
     const gitmergeParams: GitReviewParam[] = [];
     for (const i in sonarIssues.issues) {
       const issue = sonarIssues.issues[i];
       const path = issue.component.replace(issue.project + ":", "");
+      if (issue.status == "CLOSED") {
+        closedCnt++;
+        continue;
+      }
       if (issue.type == "BUG") {
         bugCnt++;
       } else if (issue.type == "VULNERABILITY") {
@@ -92,7 +97,8 @@ export class QualityGate {
       quality.projectStatus,
       bugCnt,
       vulCnt,
-      smellCnt
+      smellCnt,
+      closedCnt
     );
     Log.info("finish createReviewComments");
     Log.info("comment :"+ comment);;
@@ -100,10 +106,10 @@ export class QualityGate {
     Log.info("====")
     Log.info("start saveQualityDiscussion");
     await this.gitMerge.saveQualityDiscussion(comment);
+    Log.info("finish saveQualityDiscussion");
     if (bugCnt + vulCnt + smellCnt > 0) {
       return false;
     }
-    Log.info("finish saveQualityDiscussion");
     return true;
   }
 }
