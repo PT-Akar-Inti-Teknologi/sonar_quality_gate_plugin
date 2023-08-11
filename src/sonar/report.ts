@@ -108,6 +108,7 @@ export class SonarReport {
     codeSmellSecurity: string,
     coverageValue: number,
     duplicatedValue: number,
+    closedCount: number,
   }) {
 
     let coverageText = "**Coverage**";
@@ -124,6 +125,11 @@ export class SonarReport {
       status = "passed";
     } else {
       status = "failed";
+    }
+
+    let closedIssueText = '';
+    if (param?.closedCount > 0) {
+      closedIssueText = `${param.closedCount} issues closed`;
     }
 
     const report = `# SonarQube Code Analytics 
@@ -143,6 +149,8 @@ ${this.icon("vulnerability")}  ${this.icon(param.vulnerabilitySecurity)} [${para
 
 ${this.icon("code_smell")}  ${this.icon(param.codeSmellSecurity)} [${param.codeSmellCount} Code Smells](${this.getIssueURL("CODE_SMELL", param.mergeRequestID)})
 
+${closedIssueText}
+
 ## Coverage and Duplications
 ${this.coverageIcon(param.coverageValue)} ${coverageText}
 
@@ -158,7 +166,8 @@ ${this.duplicatedIcon(param.duplicatedValue)} ${duplicatedText}`;
     projectStatus: ProjectStatus,
     bugCount: number,
     vulnerabilityCount: number,
-    codeSmellCount: number
+    codeSmellCount: number,
+    closedCnt: number
   ) {
     const [bugSecurity, vulSecurity, smellSecurity, duplicatedCode, coverateValue] = this.getIssueSecurity(projectStatus)
     return this.templateReport({
@@ -172,6 +181,7 @@ ${this.duplicatedIcon(param.duplicatedValue)} ${duplicatedText}`;
       codeSmellSecurity: smellSecurity as string,
       coverageValue: coverateValue as number,
       duplicatedValue: duplicatedCode as number,
+      closedCount: closedCnt,
     });
   }
 
