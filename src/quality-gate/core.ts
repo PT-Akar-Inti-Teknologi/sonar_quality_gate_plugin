@@ -57,7 +57,7 @@ export class QualityGate {
     Log.info("====")
     Log.info("start findIssuesByPullRequest");
     const sonarIssues = await this.sonar.findIssuesByPullRequest(this.sonar.mergeRequestID);
-    Log.info("finish findIssuesByPullRequest");
+    Log.info("finish findIssuesByPullRequest: "+ JSON.stringify(sonarIssues));
     if (!sonarIssues) {
       return false;
     }
@@ -88,10 +88,6 @@ export class QualityGate {
         line: issue.line
       })
     }
-    // create review comments
-    Log.info("====")
-    Log.info("start createReviewComments");
-    await this.gitMerge.createReviewComments(gitmergeParams);
     const comment = this.sonar.qualityGate.report(
       this.sonar.mergeRequestID,
       quality.projectStatus,
@@ -100,13 +96,19 @@ export class QualityGate {
       smellCnt,
       closedCnt
     );
-    Log.info("finish createReviewComments");
     Log.info("comment :"+ comment);;
     // create quality report
     Log.info("====")
     Log.info("start saveQualityDiscussion");
     await this.gitMerge.saveQualityDiscussion(comment);
     Log.info("finish saveQualityDiscussion");
+
+    // create review comments
+    Log.info("====")
+    Log.info("start createReviewComments");
+    await this.gitMerge.createReviewComments(gitmergeParams);
+    Log.info("finish createReviewComments");
+    
     if (bugCnt + vulCnt + smellCnt > 0) {
       return false;
     }
