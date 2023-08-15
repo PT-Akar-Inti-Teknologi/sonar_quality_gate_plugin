@@ -27,6 +27,11 @@ export function createOptions() {
   );
   // eslint-disable-next-line  @typescript-eslint/no-var-requires
   const version = require(path.resolve(__dirname, "../../package.json")).version as string;
+  console.log(
+    chalk.blue(
+      figlet.textSync('v'+ version)
+    )
+  );
   const argv: Arguments = yargs
     .usage("Usage: $0 [options]")
     .help()

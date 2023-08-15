@@ -100,18 +100,14 @@ export class QualityGate {
     // create quality report
     Log.info("====")
     Log.info("start saveQualityDiscussion");
-    await this.gitMerge.saveQualityDiscussion(comment);
-    Log.info("finish saveQualityDiscussion");
+    const discussion = await this.gitMerge.saveQualityDiscussion(comment);
+    Log.info("finish saveQualityDiscussion: "+ JSON.stringify(discussion));
 
     // create review comments
     Log.info("====")
     Log.info("start createReviewComments");
-    await this.gitMerge.createReviewComments(gitmergeParams);
-    Log.info("finish createReviewComments");
-    
-    if (bugCnt + vulCnt + smellCnt > 0) {
-      return false;
-    }
+    const review = await this.gitMerge.createReviewComments(gitmergeParams);
+    Log.info("finish createReviewComments: "+ JSON.stringify(review));
     return true;
   }
 }
