@@ -30,6 +30,34 @@ export interface Issue {
   type: string;
 }
 
+export interface Hotspot {
+  key: string;
+  component: string;
+  project: string;
+  securityCategory: string;
+  vulnerabilityProbability: string;
+  status: string;
+  line: number;
+  message: string;
+  author: string;
+  creationDate: string;
+  updateDate: string;
+  textRange: {};
+  flows: [];
+  ruleKey: string;
+  messageFormattings: [];
+}
+
+export interface HotspotList {
+  hotspots: Hotspot[];
+  paging: {
+    pageIndex: number,
+    pageSize: number,
+    total: number
+  },
+  components: []
+}
+
 export interface IssueList {
   issues: Issue[];
   total: number;

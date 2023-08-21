@@ -69,32 +69,37 @@ export class SonarReport {
     return this.host + `/project/issues?id=${this.projectKey}&metric=${metric}&view=list&pullRequest=${mergeRequestID}`;
   }
 
+  private getHotspotURL(mergeRequestID: string) {
+    return this.host + `/security_hotspots?id=${this.projectKey}&pullRequest=${mergeRequestID}&inNewCodePeriod=true`;
+  }
+
   private getIssueSecurity(projectStatus: ProjectStatus) {
     let bugSecurity = "",
       vulSecurity = "",
       smellSecurity = "",
-      hotspotSecurity = "";
+      hotspotSecurity = SecurityLevel.A;
 
     let duplicatedCode = -1,
-      coverateValue = -1;
+      coverageValue = -1;
     for (const i in projectStatus.conditions) {
       const condition = projectStatus.conditions[i];
       const level = this.securityLevel(condition.actualValue);
+
       if (condition.metricKey == MetricKey.newReliabilityRrating) {
         bugSecurity = level;
       } else if (condition.metricKey == MetricKey.newMaintainabilityRating) {
         smellSecurity = level;
       } else if (condition.metricKey == MetricKey.newSecurityRating) {
         vulSecurity = level;
-      } else if (condition.metricKey == MetricKey.newSecurityReviewRating) {
-        hotspotSecurity = level;
+      } else if (condition.metricKey == MetricKey.newSecurityHotspotsReviewed) {
+        hotspotSecurity = SecurityLevel.E;
       } else if (condition.metricKey == MetricKey.newDuplicatedLinesDensity) {
         duplicatedCode = parseFloat(condition.actualValue);
       } else if (condition.metricKey == MetricKey.newCoverage) {
-        coverateValue = parseFloat(condition.actualValue);
+        coverageValue = parseFloat(condition.actualValue);
       }
     }
-    return [bugSecurity, vulSecurity, smellSecurity, duplicatedCode, coverateValue, hotspotSecurity];
+    return [bugSecurity, vulSecurity, smellSecurity, duplicatedCode, coverageValue, hotspotSecurity];
   }
 
   templateReport(param: {
@@ -109,6 +114,8 @@ export class SonarReport {
     coverageValue: number,
     duplicatedValue: number,
     closedCount: number,
+    hotspotSecurity: string,
+    hotspotCount: number,
   }) {
 
     let coverageText = "**Coverage**";
@@ -137,24 +144,26 @@ export class SonarReport {
 
 ${this.icon(status)}
 
-[Sonar report] (${this.getSonarURL(param.mergeRequestID)})
+[Sonar report](${this.getSonarURL(param.mergeRequestID)}) (${this.getSonarURL(param.mergeRequestID)})
 
 ## Additional information
 *The following metrics might not affect the Quality Gate status but improving them will improve your project code quality.*
 
 ## Issues
-${this.icon("bug")}  ${this.icon(param.bugSecurity)} [${param.bugCount} Bugs](${this.getIssueURL("BUG", param.mergeRequestID)})
+- Bugs:  ${this.icon(param.bugSecurity)} [${param.bugCount} Bugs](${this.getIssueURL("BUG", param.mergeRequestID)})
 
-${this.icon("vulnerability")}  ${this.icon(param.vulnerabilitySecurity)} [${param.vulnerabilityCount} Vulnerabilities](${this.getIssueURL("VULNERABILITY", param.mergeRequestID)})
+- Vulnerabilities:  ${this.icon(param.vulnerabilitySecurity)} [${param.vulnerabilityCount} Vulnerabilities](${this.getIssueURL("VULNERABILITY", param.mergeRequestID)})
 
-${this.icon("code_smell")}  ${this.icon(param.codeSmellSecurity)} [${param.codeSmellCount} Code Smells](${this.getIssueURL("CODE_SMELL", param.mergeRequestID)})
+- Code Smells:  ${this.icon(param.codeSmellSecurity)} [${param.codeSmellCount} Code Smells](${this.getIssueURL("CODE_SMELL", param.mergeRequestID)})
 
-${closedIssueText}
+- Security Hotspots:  ${this.icon(param.hotspotSecurity)} [${param.hotspotCount} Security Hotspots](${this.getHotspotURL(param.mergeRequestID)})
+
+${(closedIssueText) ? '- Closed Issues: ${closedIssueText}' : ''}
 
 ## Coverage and Duplications
-${this.coverageIcon(param.coverageValue)} ${coverageText}
+- Coverage: ${coverageText}
 
-${this.duplicatedIcon(param.duplicatedValue)} ${duplicatedText}`;
+- Duplications: ${duplicatedText}`;
 
     return report;
   }
@@ -167,9 +176,10 @@ ${this.duplicatedIcon(param.duplicatedValue)} ${duplicatedText}`;
     bugCount: number,
     vulnerabilityCount: number,
     codeSmellCount: number,
-    closedCnt: number
+    closedCnt: number,
+    hotspotCnt: number,
   ) {
-    const [bugSecurity, vulSecurity, smellSecurity, duplicatedCode, coverateValue] = this.getIssueSecurity(projectStatus)
+    const [bugSecurity, vulSecurity, smellSecurity, duplicatedCode, coverageValue, hotspotSecurity] = this.getIssueSecurity(projectStatus)
     return this.templateReport({
       mergeRequestID: mergeRequestID,
       status: projectStatus.status,
@@ -179,9 +189,11 @@ ${this.duplicatedIcon(param.duplicatedValue)} ${duplicatedText}`;
       vulnerabilitySecurity: vulSecurity as string,
       codeSmellCount: codeSmellCount,
       codeSmellSecurity: smellSecurity as string,
-      coverageValue: coverateValue as number,
+      coverageValue: coverageValue as number,
       duplicatedValue: duplicatedCode as number,
       closedCount: closedCnt,
+      hotspotSecurity: hotspotSecurity as string,
+      hotspotCount: hotspotCnt,
     });
   }
 

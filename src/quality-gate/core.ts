@@ -88,13 +88,30 @@ export class QualityGate {
         line: issue.line
       })
     }
+
+    Log.info("====")
+    Log.info("start getHotspotsByPullRequest");
+    const sonarHotspots = await this.sonar.getHotspotsByPullRequest(this.sonar.mergeRequestID);
+    let hotspotCnt = sonarHotspots.paging.total;
+    Log.info("finish getHotspotsByPullRequest: "+ JSON.stringify(sonarHotspots));
+    for (const i in sonarHotspots.hotspots) {
+      const hotspot = sonarHotspots.hotspots[i];
+      const path = hotspot.component.replace(hotspot.project + ":", "");
+      gitmergeParams.push({
+        comment: `**${hotspot.message}**`,
+        path: path,
+        line: hotspot.line
+      })
+    }
+    
     const comment = this.sonar.qualityGate.report(
       this.sonar.mergeRequestID,
       quality.projectStatus,
       bugCnt,
       vulCnt,
       smellCnt,
-      closedCnt
+      closedCnt,
+      hotspotCnt
     );
     Log.info("comment :"+ comment);;
     // create quality report

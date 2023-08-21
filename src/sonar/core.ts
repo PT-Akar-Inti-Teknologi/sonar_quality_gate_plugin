@@ -8,6 +8,7 @@ import { Log } from "../utils";
 const SONAR_QUALITY_API = "/api/qualitygates/project_status";
 const SONAR_ISSUE_API = "/api/issues/search";
 const SONAR_TASK_API = "/api/ce/activity";
+const SONAR_HOTSPOT_API = "/api/hotspots/search";
 const PAGE_SIZE = 200;
 
 export class Sonar {
@@ -120,4 +121,13 @@ export class Sonar {
     }
     return issueList;
   }
+
+  async getHotspotsByPullRequest(pullRequestId: string): Promise<entity.HotspotList> {
+    const response = await this.http.get<entity.HotspotList>(SONAR_HOTSPOT_API, { 
+      projectKey: this.projectKey,
+      pullRequest: this.mergeRequestID,
+    });
+    return response.data;
+  }
 }
+

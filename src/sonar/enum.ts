@@ -19,6 +19,7 @@ export enum MetricKey {
   newSecurityRating = "new_security_rating",
   newSecurityReviewRating = "new_security_review_rating",
   newDuplicatedLinesDensity = "new_duplicated_lines_density",
+  newSecurityHotspotsReviewed = "new_security_hotspots_reviewed",
   newCoverage = "new_coverage"
 }
 
