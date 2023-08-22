@@ -105,7 +105,9 @@ export class GithubMerge extends Github implements GitMerge {
       event: "COMMENT",
       comments: comments
     };
+    Log.info("start review comment: "+ JSON.stringify(data));
     const response = await this.http.post(api, data, {});
+    Log.info("response review comment:"+ JSON.stringify(response));
     return response.data
   }
 }
