@@ -56,9 +56,7 @@ export class GithubMerge extends Github implements GitMerge {
   }
 
   async createComment(comment: string, headers?: any): Promise<Comment> {
-    Log.info("createComment: ")
     const api = `/repos/${this.owner}/${this.projectID}/issues/${this.mergeRequestID}/comments`;
-    Log.info("api: "+ api);
     const response = await this.http.post(api, {
       body: comment
     }, {}, headers);

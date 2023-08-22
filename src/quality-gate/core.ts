@@ -94,6 +94,7 @@ export class QualityGate {
     const sonarHotspots = await this.sonar.getHotspotsByPullRequest(this.sonar.mergeRequestID);
     let hotspotCnt = sonarHotspots.paging.total;
     Log.info("finish getHotspotsByPullRequest: "+ JSON.stringify(sonarHotspots));
+
     for (const i in sonarHotspots.hotspots) {
       const hotspot = sonarHotspots.hotspots[i];
       const path = hotspot.component.replace(hotspot.project + ":", "");
@@ -113,7 +114,8 @@ export class QualityGate {
       closedCnt,
       hotspotCnt
     );
-    Log.info("comment :"+ comment);;
+    Log.info("review comment :"+ comment);;
+
     // create quality report
     Log.info("====")
     Log.info("start saveQualityDiscussion");
@@ -122,7 +124,7 @@ export class QualityGate {
 
     // create review comments
     Log.info("====")
-    Log.info("start createReviewComments");
+    Log.info("start createReviewComments:");
     const review = await this.gitMerge.createReviewComments(gitmergeParams);
     Log.info("finish createReviewComments: "+ JSON.stringify(review));
     return true;
