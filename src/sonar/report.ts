@@ -158,7 +158,7 @@ ${this.icon(status)}
 
 - Security Hotspots:  ${this.icon(param.hotspotSecurity)} [${param.hotspotCount} Security Hotspots](${this.getHotspotURL(param.mergeRequestID)})
 
-${(closedIssueText) ? '- Closed Issues: ${closedIssueText}' : ''}
+${(closedIssueText) ? `- Closed Issues: ${closedIssueText}` : ''}
 
 ## Coverage and Duplications
 - Coverage: ${coverageText}
