@@ -136,11 +136,11 @@ export class SonarReport {
 
     let closedIssueText = '';
     if (param?.closedCount > 0) {
-      closedIssueText = `${param.closedCount} issues closed`;
+      closedIssueText = `- Closed Issues: ${param.closedCount} issues closed`;
     }
 
     const report = `# SonarQube Code Analytics 
-## Quality Gate ${param.status}
+## Quality Gate Status: ${param.status}
 
 ${this.icon(status)}
 
@@ -150,15 +150,15 @@ ${this.icon(status)}
 *The following metrics might not affect the Quality Gate status but improving them will improve your project code quality.*
 
 ## Issues
-- Bugs:  ${this.icon(param.bugSecurity)} [${param.bugCount} Bugs](${this.getIssueURL("BUG", param.mergeRequestID)})
+- Bugs: ${this.icon(param.bugSecurity)} [${param.bugCount} Bugs](${this.getIssueURL("BUG", param.mergeRequestID)})
 
-- Vulnerabilities:  ${this.icon(param.vulnerabilitySecurity)} [${param.vulnerabilityCount} Vulnerabilities](${this.getIssueURL("VULNERABILITY", param.mergeRequestID)})
+- Vulnerabilities: ${this.icon(param.vulnerabilitySecurity)} [${param.vulnerabilityCount} Vulnerabilities](${this.getIssueURL("VULNERABILITY", param.mergeRequestID)})
 
-- Code Smells:  ${this.icon(param.codeSmellSecurity)} [${param.codeSmellCount} Code Smells](${this.getIssueURL("CODE_SMELL", param.mergeRequestID)})
+- Code Smells: ${this.icon(param.codeSmellSecurity)} [${param.codeSmellCount} Code Smells](${this.getIssueURL("CODE_SMELL", param.mergeRequestID)})
 
-- Security Hotspots:  ${this.icon(param.hotspotSecurity)} [${param.hotspotCount} Security Hotspots](${this.getHotspotURL(param.mergeRequestID)})
+- Security Hotspots: ${this.icon(param.hotspotSecurity)} [${param.hotspotCount} Security Hotspots](${this.getHotspotURL(param.mergeRequestID)})
 
-${(closedIssueText) ? `- Closed Issues: ${closedIssueText}` : ''}
+${closedIssueText}
 
 ## Coverage and Duplications
 - Coverage: ${coverageText}
