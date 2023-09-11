@@ -73,7 +73,7 @@ export class SonarReport {
     return this.host + `/security_hotspots?id=${this.projectKey}&pullRequest=${mergeRequestID}&inNewCodePeriod=true`;
   }
 
-  private getIssueSecurity(projectStatus: ProjectStatus) {
+  getIssueSecurity(projectStatus: ProjectStatus) {
     let bugSecurity = "",
       vulSecurity = "",
       smellSecurity = "",

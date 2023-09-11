@@ -1,6 +1,7 @@
 import { Git, GitMerge, GitReviewParam } from "../git";
-import { Sonar } from "../sonar";
+import { Sonar, SonarReport } from "../sonar";
 import { Log } from "../utils";
+import { Monitor } from "../monitor";
 
 const INTERVAL_SECONDS = 60;
 
@@ -18,15 +19,23 @@ export class QualityGate {
   sonar: Sonar;
   git?: Git;
   gitMerge: GitMerge;
+  monitor?: Monitor;
+  sonarReport: SonarReport;
 
   constructor(opt: {
     sonar: Sonar;
     git?: Git;
     gitMerge: GitMerge;
+    monitor?: Monitor;
   }) {
     this.sonar = opt.sonar;
     this.git = opt.git;
     this.gitMerge = opt.gitMerge;
+    this.monitor = opt.monitor;
+    this.sonarReport = new SonarReport({
+      host: this.sonar.host,
+      projectKey: this.sonar.projectKey,
+    });
   }
 
   async handler() {
@@ -121,6 +130,26 @@ export class QualityGate {
     Log.info("start saveQualityDiscussion");
     const discussion = await this.gitMerge.saveQualityDiscussion(comment);
     Log.info("finish saveQualityDiscussion: "+ JSON.stringify(discussion));
+
+    Log.info(">>> Monitor: "+ JSON.stringify(this.monitor));
+    if (this.monitor) {
+      const [,,, duplicatedCode, coverageValue,] = this.sonarReport.getIssueSecurity(quality.projectStatus)
+      // save monitor report
+      Log.info("====")
+      Log.info("start monitor");
+      const monitor = await this.monitor?.save({
+        bug_count: bugCnt,
+        vul_count: vulCnt,
+        smell_count: smellCnt,
+        closed_issue_count: closedCnt,
+        hotspot_count: hotspotCnt,
+        coverage_percentage: coverageValue,
+        duplication_percentage: duplicatedCode,
+        project_status: quality.projectStatus.status
+      });
+      Log.info("finish monitor: "+ JSON.stringify(monitor['response_schema']));
+    }
+    
 
     // create review comments
     Log.info("====")

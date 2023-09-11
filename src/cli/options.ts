@@ -17,6 +17,7 @@ export interface Arguments {
   define: (string | number)[] | undefined;
   git: { [key: string]: string };
   sonar: { [key: string]: string };
+  monitor: { [key: string]: string };
   debug: boolean;
 }
 export function createOptions() {
@@ -71,6 +72,13 @@ export function createOptions() {
         "  --sonar.url Sonarqube server URL. Default: $SONAR_URL or sonar.host.url in file sonar-project.properties.\n" +
         "  --sonar.token The authentication token of a SonarQube user with Execute Analysis permission on the project. Default: $SONAR_TOKEN\n" +
         "  --sonar.project_key Sonar project key. Default: sonar.projectKey in file sonar-project.properties\n",
+      group: "Global Options:",
+    })
+    .option("monitor", {
+      default: {},
+      desc: "Config monitor \n" +
+        "  --monitor.host Monitor Plugin host\n" +
+        "  --monitor.token Moniitor Plugin token\n",
       group: "Global Options:",
     })
     .version(version)

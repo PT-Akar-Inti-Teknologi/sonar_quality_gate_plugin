@@ -9,6 +9,7 @@ import { createOptions, Arguments, Provide } from "./options";
 import { Shell } from "./shell";
 import commandExistsSync from "command-exists";
 import { GithubMerge } from "../github";
+import { Monitor } from "../monitor";
 
 declare global {
   namespace NodeJS {
@@ -25,6 +26,9 @@ declare global {
       GITHUB_REPOSITORY: string;
       SONAR_PROJECT_KEY: string;
       GITHUB_ACTION: string;
+
+      MONITOR_TOKEN: string;
+      MONITOR_URL: string;
     }
   }
 }
@@ -41,6 +45,9 @@ export class Cli {
   gitProjectID: string;
   gitMergeID: string;
 
+  monitorToken: string;
+  monitorURL: string;
+
   constructor() {
     this.argv = createOptions();
     this.exec = new Shell();
@@ -52,6 +59,9 @@ export class Cli {
     this.sonarURL = this.argv.sonar.url ? this.argv.sonar.url : process.env.SONAR_URL;
     this.sonarToken = this.argv.sonar.token ? this.argv.sonar.token : process.env.SONAR_TOKEN;
     this.sonarProjectKey = this.argv.sonar.project_key ? this.argv.sonar.project_key : process.env.SONAR_PROJECT_KEY;
+
+    this.monitorToken = this.argv.monitor.token ? this.argv.monitor.token : process.env.MONITOR_TOKEN;
+    this.monitorURL = this.argv.monitor.url ? this.argv.monitor.url : process.env.MONITOR_URL;
     
     if (!this.validate()) {
       process.exit(1);
@@ -127,9 +137,21 @@ export class Cli {
         mergeRequestID: parseInt(this.gitMergeID)
       });
     }
+    let monitor = undefined;
+    if (this.monitorURL && this.monitorToken) {
+      monitor = new Monitor({
+        host: this.monitorURL,
+        token: this.monitorToken,
+        projectId: this.gitProjectID,
+        mergeId: this.gitMergeID,
+      });
+    }
+
+
     const qualityGate = new QualityGate({
       sonar: sonar,
-      gitMerge: gitMerge
+      gitMerge: gitMerge,
+      monitor,
     })
     qualityGate.handler().then(result => {
       if (!result) {
