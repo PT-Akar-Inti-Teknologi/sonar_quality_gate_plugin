@@ -127,11 +127,12 @@ export class QualityGate {
 
     // create quality report
     Log.info("====")
-    Log.info("start saveQualityDiscussion");
+    Log.info("start saveQualityDiscussion:::");
     const discussion = await this.gitMerge.saveQualityDiscussion(comment);
     Log.info("finish saveQualityDiscussion: "+ JSON.stringify(discussion));
 
-    Log.info(">>> Monitor: "+ JSON.stringify(this.monitor));
+    Log.info("====");
+    Log.info("Monitor: "+ JSON.stringify(this.monitor));
     if (this.monitor) {
       const [,,, duplicatedCode, coverageValue,] = this.sonarReport.getIssueSecurity(quality.projectStatus)
       // save monitor report
@@ -153,7 +154,7 @@ export class QualityGate {
 
     // create review comments
     Log.info("====")
-    Log.info("start createReviewComments:");
+    Log.info("start createReviewComments:::");
     const review = await this.gitMerge.createReviewComments(gitmergeParams);
     Log.info("finish createReviewComments: "+ JSON.stringify(review));
     return true;
