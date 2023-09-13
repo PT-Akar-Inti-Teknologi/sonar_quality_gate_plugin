@@ -132,6 +132,12 @@ export class QualityGate {
     const discussion = await this.gitMerge.saveQualityDiscussion(comment);
     Log.info("finish saveQualityDiscussion: "+ JSON.stringify(discussion));
 
+    // create review comments
+    Log.info("====")
+    Log.info("start createReviewComments:::");
+    const review = await this.gitMerge.createReviewComments(gitmergeParams);
+    Log.info("finish createReviewComments: "+ JSON.stringify(review));
+
     Log.info("====");
     Log.info("Monitor: "+ JSON.stringify(this.monitor));
     if (this.monitor) {
@@ -139,7 +145,7 @@ export class QualityGate {
       // save monitor report
       Log.info("====")
       Log.info("start monitor");
-      const monitor = await this.monitor?.save({
+      const monitor = await this.monitor.save({
         bug_count: bugCnt,
         vul_count: vulCnt,
         smell_count: smellCnt,
@@ -151,13 +157,6 @@ export class QualityGate {
       });
       Log.info("finish monitor: "+ JSON.stringify(monitor['response_schema']));
     }
-    
-
-    // create review comments
-    Log.info("====")
-    Log.info("start createReviewComments:::");
-    const review = await this.gitMerge.createReviewComments(gitmergeParams);
-    Log.info("finish createReviewComments: "+ JSON.stringify(review));
     return true;
   }
 }
