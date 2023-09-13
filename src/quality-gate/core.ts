@@ -39,6 +39,7 @@ export class QualityGate {
   }
 
   async handler() {
+    Log.info("start handler")
     Log.info("====")
     Log.info("start getTaskStatus");
     const taskStatus = await this.sonar.getTaskStatus();
